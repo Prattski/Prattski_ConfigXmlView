@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Prattski - Config XML View
+ *
+ * @category    Prattski
+ * @package     Prattski_ConfigXmlView
+ * @copyright   Copyright (c) 2012 Prattski (http://prattski.com)
+ * @author      Josh Pratt (josh@prattski.com)
+ */
+-->
+<config>
+    <modules>
+        <Prattski_ConfigXmlView>
+            <version>1.0.0</version>
+        </Prattski_ConfigXmlView>
+    </modules>
+    <global>
+        <blocks>
+            <prattski_configxmlview>
+                <class>Prattski_ConfigXmlView_Block</class>
+            </prattski_configxmlview>
+        </blocks>
+        <models>
+            <prattski_configxmlview>
+                <class>Prattski_ConfigXmlView_Model</class>
+            </prattski_configxmlview>
+        </models>
+    </global>
+</config>

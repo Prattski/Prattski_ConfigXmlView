@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Prattski - Config XML View
+ *
+ * @category    Prattski
+ * @package     Prattski_ConfigXmlView
+ * @copyright   Copyright (c) 2012 Prattski (http://prattski.com)
+ * @author      Josh Pratt (josh@prattski.com)
+ */
+-->
+<config>
+    <modules>
+        <Prattski_ConfigXmlView>
+            <codePool>community</codePool>
+            <active>true</active>
+        </Prattski_ConfigXmlView>
+    </modules>
+</config>

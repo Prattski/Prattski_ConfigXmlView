@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Prattski - Config XML View
+ *
+ * @category    Prattski
+ * @package     Prattski_ConfigXmlView
+ * @copyright   Copyright (c) 2012 Prattski (http://prattski.com)
+ * @author      Josh Pratt (josh@prattski.com)
+ */
+-->
+<config>
+    <tabs>
+        <prattski>
+            <label>Prattski Modules</label>
+            <sort_order>200</sort_order>
+        </prattski>
+    </tabs>
+    <sections>
+        <prattski_configxmlview_rewrites>
+            <label>Rewrites List</label>
+            <tab>prattski</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>200</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <rewrites>
+                    <frontend_model>prattski_configxmlview/system_config_rewrites</frontend_model>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                </rewrites>
+            </groups>
+        </prattski_configxmlview_rewrites>
+        <prattski_configxmlview_observers>
+            <label>Observers List</label>
+            <tab>prattski</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>200</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <observers>
+                    <frontend_model>prattski_configxmlview/system_config_observers</frontend_model>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                </observers>
+            </groups>
+        </prattski_configxmlview_observers>
+    </sections>
+</config>

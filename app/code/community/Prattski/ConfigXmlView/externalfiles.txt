@@ -1,0 +1,14 @@
+/**
+ * Prattski - Config XML View
+ *
+ * @category    Prattski
+ * @package     Prattski_ConfigXmlView
+ * @copyright   Copyright (c) 2012 Prattski (http://prattski.com)
+ * @author      Josh Pratt (josh@prattski.com)
+ */
+
+
+### Module Files Outside this Directory
+
+# Module XML File
+app/etc/modules/Prattski_ConfigXmlView.xml

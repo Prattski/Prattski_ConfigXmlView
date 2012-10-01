@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Prattski - Config XML View
+ *
+ * @category    Prattski
+ * @package     Prattski_ConfigXmlView
+ * @copyright   Copyright (c) 2012 Prattski (http://prattski.com)
+ * @author      Josh Pratt (josh@prattski.com)
+ */
+-->
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <prattski_configxmlview_rewrites>
+                                        <title>Rewrites List</title>
+                                    </prattski_configxmlview_rewrites>
+                                    <prattski_configxmlview_observers>
+                                        <title>Observers List</title>
+                                    </prattski_configxmlview_observers>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>
