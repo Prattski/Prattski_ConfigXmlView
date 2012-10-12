@@ -17,6 +17,39 @@
 class Prattski_ConfigXmlView_Model_Mage_Core_Config extends Mage_Core_Model_Config
 {
     /**
+     * Rewrites array - Used to store all of the rewrites for processing and
+     * display.
+     * 
+     * @var array 
+     */
+    protected $_rewrites = array();
+    
+    /**
+     * Observers array - Used to store all of the observers for processing and
+     * display.
+     * 
+     * @var array 
+     */
+    protected $_observers = array();
+    
+    /**
+     * Observer Names array - Used to store all of the observer names as they
+     * are being processed to help detect for observer name conflicts.
+     * 
+     * @var array 
+     */
+    protected $_observerNames = array();
+    
+    /**
+     * Observer Name Conflicts array - Used to store all the found observer name
+     * conflicts for use when displaying the observers to point out the specific
+     * conflicts.
+     * 
+     * @var array 
+     */
+    protected $_observerNameConflicts = array();
+    
+    /**
      * Get all the needed rewrites from all the config.xml files
      * 
      * @return array 
@@ -39,54 +72,46 @@ class Prattski_ConfigXmlView_Model_Mage_Core_Config extends Mage_Core_Model_Conf
                 $configFile = $this->getModuleDir('etc', $modName).DS.'config.xml';
                 if ($mergeModel->loadFile($configFile)) {
                     
-                    Mage::log(print_r($configFile, true));
+                    // Get all model rewrites
+                    $rewrites = $mergeModel->getNode('global/models/rewrite');
+                    if ($rewrites) {
+                        $this->_populateRewriteArray($rewrites, 'models');
+                    }
                     
-                    /**
-                     * Sometimes modules won't have specific nodes that this is
-                     * trying to look up.  No need to error out if that happens,
-                     * just fail silently.
-                     */
-                    try {
-                        // Get model rewrites
-                        $xml = $mergeModel->_xml->global->models->rewrite;
-                        if (!empty($xml)) {
-                            $modelsRewrites = $xml->asArray();
-
-                            foreach ($modelsRewrites as $orig => $new) {
-                                $rewritesArray['models'][$orig][] = $new;
-                            }
-                        }
-
-                        // Get block rewrites
-                        $xml = $mergeModel->_xml->global->blocks->rewrite;
-                        if (!empty($xml)) {
-                            $modelsRewrites = $xml->asArray();
-
-                            foreach ($modelsRewrites as $orig => $new) {
-                                $rewritesArray['blocks'][$orig][] = $new;
-                            }
-                        }
-
-                        // Get helper rewrites
-                        $xml = $mergeModel->_xml->global->helpers->rewrite;
-                        if (!empty($xml)) {
-                            $modelsRewrites = $xml->asArray();
-
-                            foreach ($modelsRewrites as $orig => $new) {
-                                $rewritesArray['helpers'][$orig][] = $new;
-                            }
-                        }
-                    } catch (Exception $e) {
-                        /**
-                         * Fail silently.  Most likely failing because a module
-                         * doesn't have a <global> node. 
-                         */
+                    // Get all block rewrites
+                    $rewrites = $mergeModel->getNode('global/blocks/rewrite');
+                    if ($rewrites) {
+                        $this->_populateRewriteArray($rewrites, 'blocks');
+                    }
+                    
+                    // Get all helper rewrites
+                    $rewrites = $mergeModel->getNode('global/helpers/rewrite');
+                    if ($rewrites) {
+                        $this->_populateRewriteArray($rewrites, 'helpers');
                     }
                 }
             }
         }
         
-        return $rewritesArray;
+        return $this->_rewrites;
+    }
+    
+    /**
+     * Abstracted method to process and populate the rewrites array for the
+     * different types of rewrites.
+     * 
+     * @param Mage_Core_Model_Config_Element $rewrites
+     * @param string $type 
+     */
+    protected function _populateRewriteArray(Mage_Core_Model_Config_Element $rewrites, $type)
+    {
+        // Convert the rewrites object to an array for easier processing
+        $rewrites = $rewrites->asArray();
+        
+        // Loop through each rewrite to get the original and new classes
+        foreach ($rewrites as $orig => $new) {
+            $this->_rewrites[$type][$orig][] = $new;
+        }
     }
     
     /**
@@ -99,8 +124,6 @@ class Prattski_ConfigXmlView_Model_Mage_Core_Config extends Mage_Core_Model_Conf
         $disableLocalModules = !$this->_canUseLocalModules();
 
         $mergeModel = clone $this->_prototype;
-        
-        $observersArray = array();
         
         $modules = $this->getNode('modules')->children();
         foreach ($modules as $modName=>$module) {
@@ -118,39 +141,96 @@ class Prattski_ConfigXmlView_Model_Mage_Core_Config extends Mage_Core_Model_Conf
                 $configFile = $this->getModuleDir('etc', $modName).DS.'config.xml';
                 if ($mergeModel->loadFile($configFile)) {
                     
-                    /**
-                     * Sometimes modules won't have specific nodes that this is
-                     * trying to look up.  No need to error out if that happens,
-                     * just fail silently.
-                     */
-                    try {
-                        $xml = $mergeModel->_xml->global->events;
-                        if (!empty($xml)) {
-                            $globalObservers = $xml->asArray();
-
-                            // Make sure it's a valid observer
-                            if (!empty($globalObservers) && is_array($globalObservers)) {
-
-                                // Loop through each event that is being observed
-                                foreach ($globalObservers as $event => $observers) {
-
-                                    // Loop through each specific observer
-                                    foreach ($observers['observers'] as $name => $details) {
-                                        $observersArray[$event][$name] = $details;
-                                        $observersArray[$event][$name]['module'] = $modName;
-                                    }
-                                }
-                            }
-                        }
-                    } catch (Exception $e) {
-                        /**
-                         * Fail silently.  Most likely failing because a module
-                         * doesn't have a <global> node. 
-                         */
+                    // Get all global scope events
+                    $events = $mergeModel->getNode('global/events');
+                    if ($events) {
+                        $this->_populateObserverArrays($events, $modName, 'global');
+                    }
+                    
+                    // Get all frontend scope events
+                    $events = $mergeModel->getNode('frontend/events');
+                    if ($events) {
+                        $this->_populateObserverArrays($events, $modName, 'frontend');
+                    }
+                    
+                    // Get all admin scope events
+                    $events = $mergeModel->getNode('admin/events');
+                    if ($events) {
+                        $this->_populateObserverArrays($events, $modName, 'admin');
                     }
                 }
             }
         }
-        return $observersArray;
+        
+        return $this->_observers;
+    }
+    
+    /**
+     * Abstracted method to populate the different observer arrays used in
+     * getting all of the observers, and finding any conflicts since there are
+     * multiple scopes that need to be processed.
+     * 
+     * @param Mage_Core_Model_Config_Element $events
+     * @param string $modName
+     * @param string $scope 
+     */
+    protected function _populateObserverArrays(Mage_Core_Model_Config_Element $events, $modName, $scope)
+    {
+        // Get all of the events
+        $events = $events->children();
+        
+        // Loop through each event to get all the observers
+        foreach ($events as $event => $observers) {
+
+            // Convert the observers object to an array for easier processing
+            $observers = $observers->asArray();
+
+            if (!empty($observers) && is_array($observers)) {
+                
+                // Loop through each specific observer and populate needed data
+                foreach ($observers['observers'] as $name => $details) {
+                    $this->_observers[$event][$name] = $details;
+                    $this->_observers[$event][$name]['scope'] = $scope;
+                    $this->_observers[$event][$name]['module'] = $modName;
+
+                    /**
+                        * The $eventNames array is used to keep
+                        * track of all of the event names to be
+                        * able to catch event name conflicts and
+                        * display them.
+                        * 
+                        * If the name has not yet been set, store
+                        * it, otherwise there is a conflict.
+                        */
+                    if (!isset($this->_observerNames[$name])) {
+                        $this->_observerNames[$name] = $modName;
+                    } else {
+
+                        /**
+                            * If this is the first time a conflict
+                            * has been identified, make sure to
+                            * store the first one in the array too
+                            * so both are in the list. 
+                            */
+                        if (!isset($this->_observerNameConflicts[$name])) {
+                            $this->_observerNameConflicts[$name][] = $this->_observerNames[$name];
+                        }
+
+                        // Set the current event in the conflict list
+                        $this->_observerNameConflicts[$name][] = $modName;
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Return the observer name conflicts array
+     * 
+     * @return array 
+     */
+    public function getObserverNameConflicts()
+    {
+        return $this->_observerNameConflicts;
     }
 }

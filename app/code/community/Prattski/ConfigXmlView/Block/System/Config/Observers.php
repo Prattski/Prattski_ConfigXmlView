@@ -16,7 +16,19 @@
  */
 class Prattski_ConfigXmlView_Block_System_Config_Observers extends Mage_Adminhtml_Block_Abstract implements Varien_Data_Form_Element_Renderer_Interface
 {
+    /**
+     * Observers array
+     * 
+     * @var array 
+     */
     protected $_observers;
+    
+    /**
+     * Observer name conflicts array
+     * 
+     * @var array 
+     */
+    protected $_observerNameConflicts;
     
     /**
      * Generate html to be output in the system config
@@ -28,7 +40,16 @@ class Prattski_ConfigXmlView_Block_System_Config_Observers extends Mage_Adminhtm
     {
         $this->_init();
         
-        $html = '<div style="border:1px solid #CCCCCC;margin-bottom:10px;padding:10px 5px 5px 20px;">';
+        $html = '';
+        
+        // Display warning if there are observe name conflicts
+        if (!empty($this->_observerNameConflicts)) {
+            $html .= '<div style="border: 1px solid red; background-color: #ffcccc; font-weight: bold; padding: 10px; margin-bottom: 30px;">';
+            $html .= 'There are conflicting observer names. They have been highlighted by red text. Please resolve conflicts.';
+            $html .= '</div>';
+        }
+        
+        $html .= '<div style="border:1px solid #CCCCCC;margin-bottom:10px;padding:10px 5px 5px 20px;">';
         $html .= '<h2>Event Observers</h2>';
         $html .= $this->_getObservers();
         $html .= '</div>';
@@ -44,6 +65,11 @@ class Prattski_ConfigXmlView_Block_System_Config_Observers extends Mage_Adminhtm
         $config = Mage::getModel('prattski_configxmlview/mage_core_config');
         $config->init();
         $this->_observers = $config->getObservers();
+        
+        // Sort all the observers by event name
+        ksort($this->_observers);
+        
+        $this->_observerNameConflicts = $config->getObserverNameConflicts();
     }
     
     /**
@@ -56,25 +82,36 @@ class Prattski_ConfigXmlView_Block_System_Config_Observers extends Mage_Adminhtm
     {
         $html = '';
         
+        // If there are no observers, return "None"
         if (empty($this->_observers)) {
             $html .= '<p>None</p>';
+            return $html;
         }
         
+        $html .= '<table>';
+        $html .= '<thead style="font-weight: bold"><td>Event</td><td>Module</td><td>Observer Name</td><td>Method</td><td>Scope</td></thead>';
+        
+        // Loop through each event
         foreach ($this->_observers as $event => $observers) {
             
-            $html .= '<h3>'.$event.'</h3>';
-            
-            $html .= '<ul>';
-            
+            // Loop through each observer for the current event
             foreach ($observers as $name => $details) {
-                $html .= '<li>'.$name;
-                $html .= '<li>&nbsp;&nbsp;&nbsp;&nbsp;Module: '.$details['module'].'</li>';
-                $html .= '<li>&nbsp;&nbsp;&nbsp;&nbsp;Class/Method: '.$details['class'].'::'.$details['method'].'</li>';
-                $html .= '</li>';
+                
+                // If the current observer has a name conflict, set style
+                $conflict = (key_exists($name, $this->_observerNameConflicts)) ? ' color: red; font-weight: bold;' : '';
+                
+                $html .= "<tr>";
+                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$event.'</td>';
+                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$details['module'].'</td>';
+                $html .= '<td style="padding: 5px 20px 5px 5px;'.$conflict.'">'.$name.'</td>';
+                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$details['method'].'</td>';
+                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$details['scope'].'</td>';
+                $html .= '</tr>';
             }
             
-            $html .= '</ul>';
         }
+        
+        $html .= '</table>';
         
         return $html;
     }

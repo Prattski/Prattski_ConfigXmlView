@@ -1,0 +1,26 @@
+/**
+ * Prattski - Config XML View
+ *
+ * @category    Prattski
+ * @package     Prattski_ConfigXmlView
+ * @copyright   Copyright (c) 2012 Prattski (http://prattski.com)
+ * @author      Josh Pratt (josh@prattski.com)
+ */
+
+
+Change Log:
+
+1.1.0 (10/11/2012)
+
+ - Rewrote the way the xml elements are accessed. Original method was bad and
+   caused occasional issues and improperly accessed the xml.
+ - Added warning and highlighting of observer name conflicts 
+ - Added listing and display of observers in the frontend and admin nodes.
+   Originally only displayed observers in the global node.
+ - Modified display of observer list so it didn't look so bad.
+
+--------------------------------------------------------------------------------
+
+1.0.0 (09/27/2012)
+
+ - Initial version of the module

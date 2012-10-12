@@ -16,6 +16,11 @@
  */
 class Prattski_ConfigXmlView_Block_System_Config_Rewrites extends Mage_Adminhtml_Block_Abstract implements Varien_Data_Form_Element_Renderer_Interface
 {
+    /**
+     * Rewrites array
+     * 
+     * @var array 
+     */
     protected $_rewrites;
     
     /**
@@ -73,20 +78,29 @@ class Prattski_ConfigXmlView_Block_System_Config_Rewrites extends Mage_Adminhtml
                 return '';
         }
         
+        // If there are no rewrites, just display "None"
         if (empty($rewrites)) {
             $html .= '<p>None</p>';
             return $html;
         }
+        
         $html .= '<ul>';
 
+        // Loop through each rewrite for display
         foreach ($rewrites as $coreModel => $rewrite) {
             
-            if (count($rewrite) > 1) {
-                $style = ' style="color: red"';
-            } else {
-                $style = '';
-            }
-            
+            /**
+             * If there are multiple of the same rewrite, then there is a
+             * conflict, and it will be displayed in red.  So, set the style
+             * attribute to red. 
+             */
+            $style = (count($rewrite) > 1) ? ' style="color: red"' : '';
+
+            /**
+             * We need to loop through the rewrites again because there could be
+             * multiple (conflicting).  There should only be one here if there
+             * is no conflict.
+             */
             foreach ($rewrite as $rewriteClass) {
                 $html .= '<li'.$style.'>'.$coreModel.'&nbsp;&nbsp;&nbsp;&nbsp;>>&nbsp;&nbsp;&nbsp;&nbsp;'.$rewriteClass.'</li>';
             }
