@@ -73,21 +73,21 @@ class Prattski_ConfigXmlView_Model_Mage_Core_Config extends Mage_Core_Model_Conf
                 if ($mergeModel->loadFile($configFile)) {
                     
                     // Get all model rewrites
-                    $rewrites = $mergeModel->getNode('global/models/rewrite');
+                    $rewrites = $mergeModel->getNode('global/models');
                     if ($rewrites) {
-                        $this->_populateRewriteArray($rewrites, 'models');
+                        $this->_populateRewriteArray($rewrites, $modName, 'models');
                     }
                     
                     // Get all block rewrites
-                    $rewrites = $mergeModel->getNode('global/blocks/rewrite');
+                    $rewrites = $mergeModel->getNode('global/blocks');
                     if ($rewrites) {
-                        $this->_populateRewriteArray($rewrites, 'blocks');
+                        $this->_populateRewriteArray($rewrites, $modName, 'blocks');
                     }
                     
                     // Get all helper rewrites
-                    $rewrites = $mergeModel->getNode('global/helpers/rewrite');
+                    $rewrites = $mergeModel->getNode('global/helpers');
                     if ($rewrites) {
-                        $this->_populateRewriteArray($rewrites, 'helpers');
+                        $this->_populateRewriteArray($rewrites, $modName, 'helpers');
                     }
                 }
             }
@@ -103,14 +103,26 @@ class Prattski_ConfigXmlView_Model_Mage_Core_Config extends Mage_Core_Model_Conf
      * @param Mage_Core_Model_Config_Element $rewrites
      * @param string $type 
      */
-    protected function _populateRewriteArray(Mage_Core_Model_Config_Element $rewrites, $type)
+    protected function _populateRewriteArray(Mage_Core_Model_Config_Element $rewrites, $modName, $type)
     {
         // Convert the rewrites object to an array for easier processing
         $rewrites = $rewrites->asArray();
         
         // Loop through each rewrite to get the original and new classes
-        foreach ($rewrites as $orig => $new) {
-            $this->_rewrites[$type][$orig][] = $new;
+        foreach ($rewrites as $module => $nodes) {
+            
+            // Check to see if there are any rewrites for the current core module
+            if (isset($nodes['rewrite'])) {
+                
+                // Loop through each rewrite and store it
+                foreach ($nodes['rewrite'] as $classSuffix => $rewrite) {
+                    $rewriteInfo = array(
+                        'module_name' => $modName,
+                        'rewrite_class' => $rewrite
+                    );
+                    $this->_rewrites[$type][$module.'_'.$classSuffix][] = $rewriteInfo;
+                }
+            }
         }
     }
     

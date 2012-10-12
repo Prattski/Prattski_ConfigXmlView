@@ -84,29 +84,37 @@ class Prattski_ConfigXmlView_Block_System_Config_Rewrites extends Mage_Adminhtml
             return $html;
         }
         
-        $html .= '<ul>';
-
+        // Sort by core class
+        ksort($rewrites);
+        
+        $html .= '<table>';
+        $html .= '<thead style="font-weight: bold"><td>Core Class</td><td>Rewrite Class</td><td>Module</td></thead>';
+        
         // Loop through each rewrite for display
-        foreach ($rewrites as $coreModel => $rewrite) {
-            
+        foreach ($rewrites as $coreClass => $rewrite) {
+                
             /**
              * If there are multiple of the same rewrite, then there is a
              * conflict, and it will be displayed in red.  So, set the style
              * attribute to red. 
              */
-            $style = (count($rewrite) > 1) ? ' style="color: red"' : '';
-
+            $conflict = (count($rewrite) > 1) ? ' color: red;' : '';
+            
             /**
              * We need to loop through the rewrites again because there could be
              * multiple (conflicting).  There should only be one here if there
              * is no conflict.
              */
-            foreach ($rewrite as $rewriteClass) {
-                $html .= '<li'.$style.'>'.$coreModel.'&nbsp;&nbsp;&nbsp;&nbsp;>>&nbsp;&nbsp;&nbsp;&nbsp;'.$rewriteClass.'</li>';
+            foreach ($rewrite as $rewriteInfo) {
+                $html .= "<tr>";
+                $html .= '<td style="padding: 5px 20px 5px 5px;'.$conflict.'">'.$coreClass.'</td>';
+                $html .= '<td style="padding: 5px 20px 5px 5px;'.$conflict.'">'.$rewriteInfo['rewrite_class'].'</td>';
+                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$rewriteInfo['module_name'].'</td>';
+                $html .= '</tr>';
             }
         }
-
-        $html .= '</ul>';
+        
+        $html .= '</table>';
         
         return $html;
     }
