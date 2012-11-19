@@ -10,10 +10,17 @@
 
 Change Log:
 
+1.2.1 (11/19/2012)
+
+ - Updated styling of the observers and rewrites tables to inherit the Magento
+   admin table styling.
+
+--------------------------------------------------------------------------------
+
 1.2.0 (10/12/2012)
 
  - Fixed rewrite listing, was broken and not getting any rewrites at all.
- - Added module name to each rewrite
+ - Added module name to each rewrite.
 
 --------------------------------------------------------------------------------
 

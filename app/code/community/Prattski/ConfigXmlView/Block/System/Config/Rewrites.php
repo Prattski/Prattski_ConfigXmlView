@@ -33,12 +33,10 @@ class Prattski_ConfigXmlView_Block_System_Config_Rewrites extends Mage_Adminhtml
     {
         $this->_init();
         
-        $html = '<div style="border:1px solid #CCCCCC;margin-bottom:10px;padding:10px 5px 5px 20px;">';
-        $html .= '<h2>Rewrites</h2>';
+        $html = '<h2>Rewrites</h2>';
         $html .= $this->_getRewrites('models');
         $html .= $this->_getRewrites('blocks');
         $html .= $this->_getRewrites('helpers');
-        $html .= '</div>';
 
         return $html;
     }
@@ -87,8 +85,8 @@ class Prattski_ConfigXmlView_Block_System_Config_Rewrites extends Mage_Adminhtml
         // Sort by core class
         ksort($rewrites);
         
-        $html .= '<table>';
-        $html .= '<thead style="font-weight: bold"><td>Core Class</td><td>Rewrite Class</td><td>Module</td></thead>';
+        // Get the table header html
+        $html .= $this->_renderTableHeader();
         
         // Loop through each rewrite for display
         foreach ($rewrites as $coreClass => $rewrite) {
@@ -107,14 +105,53 @@ class Prattski_ConfigXmlView_Block_System_Config_Rewrites extends Mage_Adminhtml
              */
             foreach ($rewrite as $rewriteInfo) {
                 $html .= "<tr>";
-                $html .= '<td style="padding: 5px 20px 5px 5px;'.$conflict.'">'.$coreClass.'</td>';
-                $html .= '<td style="padding: 5px 20px 5px 5px;'.$conflict.'">'.$rewriteInfo['rewrite_class'].'</td>';
-                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$rewriteInfo['module_name'].'</td>';
+                $html .= '<td style="'.$conflict.'">'.$coreClass.'</td>';
+                $html .= '<td style="'.$conflict.'">'.$rewriteInfo['rewrite_class'].'</td>';
+                $html .= '<td>'.$rewriteInfo['module_name'].'</td>';
                 $html .= '</tr>';
             }
         }
         
+        // Get the table footer html
+        $html .= $this->_renderTableFooter();
+        
+        return $html;
+    }
+    
+    /**
+     * Method to create the table headings for the 3 different tables used to
+     * ouput the rewrite lists.  This utilizes Magento's already existing table
+     * styles
+     * 
+     * @return html 
+     */
+    protected function _renderTableHeader()
+    {
+        $html = '';
+        $html .= '<div class="grid">';
+        $html .= '<div class="hor-scroll">';
+        $html .= '<table cellspacing="0" class="data">';
+        $html .= '<colgroup><col><col><col></colgroup>';
+        $html .= '<thead><tr class="headings">';
+        $html .= '<th><span class="nobr">Core Class</span></th>';
+        $html .= '<th><span class="nobr">Rewrite Class</span></th>';
+        $html .= '<th class="last"><span class="nobr">Module</span></th>';
+        $html .= '</tr></thead>';
+        
+        return $html;
+    }
+    
+    /**
+     * Method to create the table footer for the 3 different tables used to
+     * ouput the rewrite lists
+     * 
+     * @return string 
+     */
+    protected function _renderTableFooter()
+    {
+        $html = '';
         $html .= '</table>';
+        $html .= '</div></div>';
         
         return $html;
     }

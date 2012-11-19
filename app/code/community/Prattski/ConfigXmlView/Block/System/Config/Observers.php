@@ -44,15 +44,13 @@ class Prattski_ConfigXmlView_Block_System_Config_Observers extends Mage_Adminhtm
         
         // Display warning if there are observe name conflicts
         if (!empty($this->_observerNameConflicts)) {
-            $html .= '<div style="border: 1px solid red; background-color: #ffcccc; font-weight: bold; padding: 10px; margin-bottom: 30px;">';
+            $html .= '<div style="border: 1px solid red; background-color: #ffcccc; font-weight: bold; padding: 10px; margin-bottom: 20px;">';
             $html .= 'There are conflicting observer names. They have been highlighted by red text. Please resolve conflicts.';
             $html .= '</div>';
         }
         
-        $html .= '<div style="border:1px solid #CCCCCC;margin-bottom:10px;padding:10px 5px 5px 20px;">';
         $html .= '<h2>Event Observers</h2>';
         $html .= $this->_getObservers();
-        $html .= '</div>';
 
         return $html;
     }
@@ -88,8 +86,18 @@ class Prattski_ConfigXmlView_Block_System_Config_Observers extends Mage_Adminhtm
             return $html;
         }
         
-        $html .= '<table>';
-        $html .= '<thead style="font-weight: bold"><td>Event</td><td>Module</td><td>Observer Name</td><td>Method</td><td>Scope</td></thead>';
+        $html .= '<div class="grid">';
+        $html .= '<div class="hor-scroll">';
+        $html .= '<table cellspacing="0" class="data" id="observers-grid">';
+        $html .= '<colgroup><col><col><col><col><col></colgroup>';
+        $html .= '<thead><tr class="headings">';
+        $html .= '<th><span class="nobr">Event</span></th>';
+        $html .= '<th><span class="nobr">Module</span></th>';
+        $html .= '<th><span class="nobr">Observer Name</span></th>';
+        $html .= '<th><span class="nobr">Method</span></th>';
+        $html .= '<th class="last"><span class="nobr">Scope</span></th>';
+        $html .= '</tr></thead>';
+        $html .= '<tbody>';
         
         // Loop through each event
         foreach ($this->_observers as $event => $observers) {
@@ -101,17 +109,18 @@ class Prattski_ConfigXmlView_Block_System_Config_Observers extends Mage_Adminhtm
                 $conflict = (key_exists($name, $this->_observerNameConflicts)) ? ' color: red; font-weight: bold;' : '';
                 
                 $html .= "<tr>";
-                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$event.'</td>';
-                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$details['module'].'</td>';
-                $html .= '<td style="padding: 5px 20px 5px 5px;'.$conflict.'">'.$name.'</td>';
-                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$details['method'].'</td>';
-                $html .= '<td style="padding: 5px 20px 5px 5px;">'.$details['scope'].'</td>';
+                $html .= '<td>'.$event.'</td>';
+                $html .= '<td>'.$details['module'].'</td>';
+                $html .= '<td style="'.$conflict.'">'.$name.'</td>';
+                $html .= '<td>'.$details['method'].'</td>';
+                $html .= '<td>'.$details['scope'].'</td>';
                 $html .= '</tr>';
             }
             
         }
         
         $html .= '</table>';
+        $html .= '</div></div>';
         
         return $html;
     }
